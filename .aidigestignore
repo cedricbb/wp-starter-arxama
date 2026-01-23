@@ -1,0 +1,49 @@
+# Dépendances
+vendor/
+node_modules/
+
+# WordPress runtime
+web/app/uploads/
+web/wp/
+web/wp-config.php
+
+# Git / IDE
+.git/
+.idea/
+.vscode/
+
+# Infra / data
+dumps/
+logs/
+cache/
+storage/
+tmp/
+
+# Assets lourds
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico
+*.pdf
+*.zip
+*.tar
+*.gz
+
+# Certificats & secrets
+*.pem
+*.key
+*.crt
+
+# SQL & logs
+*.sql
+*.log
+
+*.woff
+*.woff2
+*.ttf
+*.eot
+*.mp4
+*.mov

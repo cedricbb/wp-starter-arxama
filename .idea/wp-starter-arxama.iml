@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/web/app/plugins" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/web/app/plugins/elementor/includes/elements" isTestSource="false" packagePrefix="Elementor" />
+      <sourceFolder url="file://$MODULE_DIR$/web/app/plugins/elementor/includes/settings" isTestSource="false" packagePrefix="Elementor" />
+      <sourceFolder url="file://$MODULE_DIR$/web/app/plugins/elementor/vendor_prefixed/twig/symfony/polyfill-ctype/" isTestSource="false" packagePrefix="ElementorDeps\Symfony\Polyfill\Ctype\" />
+      <sourceFolder url="file://$MODULE_DIR$/web/app/plugins/elementor/vendor_prefixed/twig/symfony/polyfill-mbstring/" isTestSource="false" packagePrefix="ElementorDeps\Symfony\Polyfill\Mbstring\" />
+      <sourceFolder url="file://$MODULE_DIR$/web/app/plugins/elementor/vendor_prefixed/twig/symfony/polyfill-php80/" isTestSource="false" packagePrefix="ElementorDeps\Symfony\Polyfill\Php80\" />
+      <sourceFolder url="file://$MODULE_DIR$/web/app/plugins/elementor/vendor_prefixed/twig/symfony/polyfill-php81/" isTestSource="false" packagePrefix="ElementorDeps\Symfony\Polyfill\Php81\" />
+      <sourceFolder url="file://$MODULE_DIR$/web/app/plugins/elementor/vendor_prefixed/twig/twig/twig/src" isTestSource="false" packagePrefix="ElementorDeps\Twig\" />
+      <sourceFolder url="file://$MODULE_DIR$/web/app/plugins/elementor/vendor_prefixed/twig/twig/twig/tests" isTestSource="true" packagePrefix="ElementorDeps\Twig\Tests\" />
+      <sourceFolder url="file://$MODULE_DIR$/web/app/themes/hello-elementor" isTestSource="false" packagePrefix="HelloTheme" />
+      <sourceFolder url="file://$MODULE_DIR$/web/wp/wp-includes" isTestSource="false" packagePrefix="PHPMailer" />
+      <sourceFolder url="file://$MODULE_DIR$/web/wp/wp-includes/SimplePie/src" isTestSource="false" packagePrefix="SimplePie" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/graham-campbell/result-type" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/laravel/pint" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/oscarotero/env" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpoption/phpoption" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/roots/bedrock-autoloader" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/roots/wordpress-core-installer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/roots/wp-config" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php80" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/vlucas/phpdotenv" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

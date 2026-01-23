@@ -1,0 +1,12 @@
+*.php
+*.yml
+*.yaml
+*.json
+*.md
+*.env
+*.sh
+*.js
+*.ts
+*.css
+Makefile
+Dockerfile

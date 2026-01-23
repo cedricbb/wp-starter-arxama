@@ -9,6 +9,6 @@ RUN apk add --no-cache \
     icu-dev \
     oniguruma-dev \
     mysql-client \
-    && docker-php-ext-install pdo pdo_mysql intl zip opcache
+    && docker-php-ext-install pdo pdo_mysql mysqli intl zip opcache
 
 WORKDIR /var/www/html

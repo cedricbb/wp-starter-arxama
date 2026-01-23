@@ -34,6 +34,9 @@ DB_USER="$DbUser"
 DB_PASSWORD="$DbPassword"
 DB_HOST="mariadb"
 
+WP_HOME="https://$ProjectDomain"
+WP_SITEURL="https://$ProjectDomain/wp"
+
 AUTH_KEY="$(New-Salt)"
 SECURE_AUTH_KEY="$(New-Salt)"
 LOGGED_IN_KEY="$(New-Salt)"

@@ -39,6 +39,9 @@ DB_USER="$DB_USER"
 DB_PASSWORD="$DB_PASSWORD"
 DB_HOST="mariadb"
 
+WP_HOME="https://${PROJECT_DOMAIN}"
+WP_SITEURL="https://${PROJECT_DOMAIN}/wp"
+
 AUTH_KEY="$(generate_salt)"
 SECURE_AUTH_KEY="$(generate_salt)"
 LOGGED_IN_KEY="$(generate_salt)"
@@ -48,5 +51,6 @@ SECURE_AUTH_SALT="$(generate_salt)"
 LOGGED_IN_SALT="$(generate_salt)"
 NONCE_SALT="$(generate_salt)"
 EOF
+
 
 echo "✅ .env and .env.local generated"

@@ -29,3 +29,9 @@ wp-cli.local.yml
 
 #  Node
 /node_modules
+
+#ai-digest
+/.aidigest
+
+#.idea
+/.idea

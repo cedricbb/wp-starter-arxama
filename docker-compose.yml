@@ -18,6 +18,7 @@ services:
 
   php:
     build: docker/php
+    user: "${UID:-1000}:${GID:-1000}"
     container_name: wp-php-${PROJECT_NAME}
     volumes:
       - .:/var/www/html
@@ -25,6 +26,12 @@ services:
       - .env
     networks:
       - backend
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    depends_on:
+      mariadb:
+        condition: service_healthy
 
   mariadb:
     image: mariadb:10.11
@@ -38,6 +45,11 @@ services:
       - db:/var/lib/mysql
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   redis:
     image: redis:7-alpine

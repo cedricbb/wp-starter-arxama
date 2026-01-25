@@ -22,6 +22,7 @@ services:
 
   php:
     container_name: wp-php-${PROJECT_NAME}
+    user: "${UID:-1000}:${GID:-1000}"
     build:
       context: ./docker/php
       dockerfile: Dockerfile
@@ -33,6 +34,9 @@ services:
         condition: service_healthy
     networks:
       - backend
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
 
   mariadb:
     container_name: wp-db-${PROJECT_NAME}

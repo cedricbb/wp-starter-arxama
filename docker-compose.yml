@@ -34,9 +34,6 @@ services:
         condition: service_healthy
     networks:
       - backend
-    dns:
-      - 1.1.1.1
-      - 8.8.8.8
 
   mariadb:
     container_name: wp-db-${PROJECT_NAME}

@@ -35,27 +35,6 @@ services:
     networks:
       - backend
 
-  mariadb:
-    container_name: wp-db-${PROJECT_NAME}
-    image: mariadb:10.11.9-ubi
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - db_data:/var/lib/mysql
-    labels:
-      - "traefik.enable=false"
-    networks:
-      - backend
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
   redis:
     container_name: wp-redis-${PROJECT_NAME}
     image: redis:5-alpine
@@ -68,7 +47,3 @@ services:
 networks:
   backend:
     external: true
-
-volumes:
-  db_data:
-    name: db_${PROJECT_NAME}_data

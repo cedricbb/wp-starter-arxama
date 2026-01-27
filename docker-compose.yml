@@ -9,8 +9,6 @@ services:
     depends_on:
       php:
         condition: service_started
-      mariadb:
-        condition: service_healthy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.${PROJECT_NAME}.rule=Host(`${PROJECT_DOMAIN}`)"
@@ -29,9 +27,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./:/var/www/html
-    depends_on:
-      mariadb:
-        condition: service_healthy
     networks:
       - backend
 

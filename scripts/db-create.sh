@@ -21,7 +21,7 @@ echo "➡️  DB_USER=$DB_USER"
 
 echo "🐳 Création de la base via Docker..."
 
-# Construire la requête SQL dans une variable pour éviter les problèmes de heredoc
+# Construire la requête SQL dans une variable
 # Échapper les apostrophes dans le mot de passe pour la sécurité
 DB_PASSWORD_ESCAPED=$(echo "$DB_PASSWORD" | sed "s/'/\\\\'/g")
 
@@ -33,20 +33,24 @@ FLUSH PRIVILEGES;
 "
 
 # Utiliser un conteneur temporaire pour exécuter la commande
+# Passer SQL_COMMAND comme variable d'environnement pour éviter les problèmes de quoting
 docker run --rm --network backend \
   -e MYSQL_PWD="$DB_ROOT_PASSWORD" \
+  -e DB_HOST="$DB_HOST" \
+  -e SQL_COMMAND="$SQL_COMMAND" \
   mariadb:10.11 \
-  bash -c "
-    echo '⏳ Attente de MariaDB ($DB_HOST)...';
-    until mysqladmin ping -h \"$DB_HOST\" -u root --silent; do
+  bash -c '
+    echo "⏳ Attente de MariaDB ($DB_HOST)...";
+    until mysqladmin ping -h "$DB_HOST" -u root --silent; do
       sleep 1;
-      echo -n '.';
+      echo -n ".";
     done;
-    echo '';
-    echo '✅ MariaDB disponible';
+    echo "";
+    echo "✅ MariaDB disponible";
 
-    echo '🛠 Création de la base et de l\\\'utilisateur...';
-    mysql -h \"$DB_HOST\" -u root -e \"$SQL_COMMAND\"
-"
+    echo "🛠 Création de la base et de l\\\'utilisateur...";
+    # Exécuter la commande SQL passée via l\'environnement
+    mysql -h "$DB_HOST" -u root -e "$SQL_COMMAND"
+'
 
 echo "✅ Base de données prête"

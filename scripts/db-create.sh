@@ -21,36 +21,38 @@ echo "➡️  DB_USER=$DB_USER"
 
 echo "🐳 Création de la base via Docker..."
 
-# Construire la requête SQL dans une variable
-# Échapper les apostrophes dans le mot de passe pour la sécurité
-DB_PASSWORD_ESCAPED=$(echo "$DB_PASSWORD" | sed "s/'/\\\\'/g")
+# Utiliser un "here document" pour passer le script au conteneur.
+# Cela évite TOUS les problèmes de guillemets avec bash -c.
+# Le -i est important pour que le conteneur lise sur son entrée standard.
+docker run --rm -i --network backend \
+  -e MYSQL_PWD="$DB_ROOT_PASSWORD" \
+  -e DB_HOST="$DB_HOST" \
+  -e DB_NAME="$DB_NAME" \
+  -e DB_USER="$DB_USER" \
+  -e DB_PASSWORD="$DB_PASSWORD" \
+  mariadb:10.11 bash <<'EOF'
+echo "⏳ Attente de MariaDB ($DB_HOST)..."
+until mysqladmin ping -h "$DB_HOST" -u root --silent; do
+  sleep 1
+  echo -n "."
+done
+echo ""
+echo "✅ MariaDB disponible"
 
-SQL_COMMAND="
+echo "🛠 Création de la base et de l'utilisateur..."
+
+# Échapper le mot de passe pour SQL directement dans le conteneur
+DB_PASSWORD_ESCAPED=$(echo "$DB_PASSWORD" | sed "s/'/\\\\'/g; s/\"/\\\\\"/g")
+
+# Utiliser un autre here-doc pour la commande SQL
+mysql -h "$DB_HOST" -u root <<SQL
 CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD_ESCAPED';
 GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'%';
 FLUSH PRIVILEGES;
-"
+SQL
 
-# Utiliser un conteneur temporaire pour exécuter la commande
-# Passer SQL_COMMAND comme variable d'environnement pour éviter les problèmes de quoting
-docker run --rm --network backend \
-  -e MYSQL_PWD="$DB_ROOT_PASSWORD" \
-  -e DB_HOST="$DB_HOST" \
-  -e SQL_COMMAND="$SQL_COMMAND" \
-  mariadb:10.11 \
-  bash -c '
-    echo "⏳ Attente de MariaDB ($DB_HOST)...";
-    until mysqladmin ping -h "$DB_HOST" -u root --silent; do
-      sleep 1;
-      echo -n ".";
-    done;
-    echo "";
-    echo "✅ MariaDB disponible";
+echo "✅ Base de données et utilisateur créés"
+EOF
 
-    echo "🛠 Création de la base et de l\\\'utilisateur...";
-    # Exécuter la commande SQL passée via l\'environnement
-    mysql -h "$DB_HOST" -u root -e "$SQL_COMMAND"
-'
-
-echo "✅ Base de données prête"
+echo "✅ Processus de création de base de données terminé."

@@ -26,30 +26,38 @@ echo "➡️  DB_USER=$DB_USER"
 echo "🐳 Création de la base via Docker..."
 
 # Note: Le réseau 'backend' doit exister (créé par stack-dev)
+# Nous devons échapper correctement les variables pour qu'elles soient interprétées par le shell du conteneur
+# ou les passer en variables d'environnement au conteneur.
+# Passer par des variables d'environnement est plus sûr et évite les problèmes de quoting.
+
 docker run --rm --network backend \
   -e MYSQL_PWD="$DB_ROOT_PASSWORD" \
+  -e DB_HOST="$DB_HOST" \
+  -e DB_NAME="$DB_NAME" \
+  -e DB_USER="$DB_USER" \
+  -e DB_PASSWORD="$DB_PASSWORD" \
   mariadb:10.11 \
-  bash -c "
-    echo '⏳ Attente de MariaDB ($DB_HOST)...';
+  bash -c '
+    echo "⏳ Attente de MariaDB ($DB_HOST)...";
     TIMEOUT=60; COUNTER=0;
-    until mysqladmin ping -h '$DB_HOST' -u root --silent; do
-      if [ \$COUNTER -gt \$TIMEOUT ]; then
-        echo '❌ Timeout'; exit 1;
+    until mysqladmin ping -h "$DB_HOST" -u root --silent; do
+      if [ $COUNTER -gt $TIMEOUT ]; then
+        echo "❌ Timeout"; exit 1;
       fi;
       sleep 2;
       let COUNTER=COUNTER+2;
-      echo -n '.';
+      echo -n ".";
     done;
-    echo '';
-    echo '✅ MariaDB disponible';
+    echo "";
+    echo "✅ MariaDB disponible";
 
-    echo '🛠 Création de la base et de l\'utilisateur...';
-    mysql -h '$DB_HOST' -u root <<EOF
+    echo "🛠 Création de la base et de l'\''utilisateur...";
+    mysql -h "$DB_HOST" -u root <<EOF
 CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
-GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'%';
+CREATE USER IF NOT EXISTS '\''$DB_USER'\''@'\''%'\'' IDENTIFIED BY '\''$DB_PASSWORD'\'';
+GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '\''$DB_USER'\''@'\''%'\'';
 FLUSH PRIVILEGES;
 EOF
-"
+'
 
 echo "✅ Base de données prête"

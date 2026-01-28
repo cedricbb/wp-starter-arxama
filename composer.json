@@ -16,6 +16,11 @@
       "homepage": "https://github.com/retlehs"
     }
   ],
+  "autoload": {
+    "psr-4": {
+      "App\\": "web/app/themes/arxama-child/"
+    }
+  },
   "keywords": [
     "bedrock",
     "composer",
@@ -55,6 +60,7 @@
     "laravel/pint": "^1.18"
   },
   "config": {
+    "process-timeout": 600,
     "optimize-autoloader": true,
     "preferred-install": "dist",
     "allow-plugins": {

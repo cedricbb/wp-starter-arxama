@@ -3,10 +3,8 @@ set -e
 
 echo "🗄️  Initialisation de la base de données..."
 
-# Charger les variables d'environnement si .env existe
+# Charger les variables d'environnement de manière sûre
 if [ -f .env ]; then
-  # On utilise grep pour filtrer UID/GID qui sont des variables readonly en bash
-  # et on exporte les autres
   export $(grep -v '^#' .env | grep -vE '^(UID|GID)=' | xargs)
 fi
 
@@ -21,43 +19,34 @@ echo "➡️  DB_HOST=$DB_HOST"
 echo "➡️  DB_NAME=$DB_NAME"
 echo "➡️  DB_USER=$DB_USER"
 
-# On utilise un conteneur temporaire pour créer la base de données
-# Cela permet d'être sur le même réseau (backend) et d'avoir le client mysql
 echo "🐳 Création de la base via Docker..."
 
-# Note: Le réseau 'backend' doit exister (créé par stack-dev)
-# Nous devons échapper correctement les variables pour qu'elles soient interprétées par le shell du conteneur
-# ou les passer en variables d'environnement au conteneur.
-# Passer par des variables d'environnement est plus sûr et évite les problèmes de quoting.
+# Construire la requête SQL dans une variable pour éviter les problèmes de heredoc
+# Échapper les apostrophes dans le mot de passe pour la sécurité
+DB_PASSWORD_ESCAPED=$(echo "$DB_PASSWORD" | sed "s/'/\\\\'/g")
 
+SQL_COMMAND="
+CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD_ESCAPED';
+GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'%';
+FLUSH PRIVILEGES;
+"
+
+# Utiliser un conteneur temporaire pour exécuter la commande
 docker run --rm --network backend \
   -e MYSQL_PWD="$DB_ROOT_PASSWORD" \
-  -e DB_HOST="$DB_HOST" \
-  -e DB_NAME="$DB_NAME" \
-  -e DB_USER="$DB_USER" \
-  -e DB_PASSWORD="$DB_PASSWORD" \
   mariadb:10.11 \
-  bash -c '
-    echo "⏳ Attente de MariaDB ($DB_HOST)...";
-    TIMEOUT=60; COUNTER=0;
-    until mysqladmin ping -h "$DB_HOST" -u root --silent; do
-      if [ $COUNTER -gt $TIMEOUT ]; then
-        echo "❌ Timeout"; exit 1;
-      fi;
-      sleep 2;
-      let COUNTER=COUNTER+2;
-      echo -n ".";
+  bash -c "
+    echo '⏳ Attente de MariaDB ($DB_HOST)...';
+    until mysqladmin ping -h \"$DB_HOST\" -u root --silent; do
+      sleep 1;
+      echo -n '.';
     done;
-    echo "";
-    echo "✅ MariaDB disponible";
+    echo '';
+    echo '✅ MariaDB disponible';
 
-    echo "🛠 Création de la base et de l'\''utilisateur...";
-    mysql -h "$DB_HOST" -u root <<EOF
-CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS '\''$DB_USER'\''@'\''%'\'' IDENTIFIED BY '\''$DB_PASSWORD'\'';
-GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '\''$DB_USER'\''@'\''%'\'';
-FLUSH PRIVILEGES;
-EOF
-'
+    echo '🛠 Création de la base et de l\\\'utilisateur...';
+    mysql -h \"$DB_HOST\" -u root -e \"$SQL_COMMAND\"
+"
 
 echo "✅ Base de données prête"

@@ -30,6 +30,9 @@ services:
     networks:
       - backend
 
+  # Redis est déjà présent dans la stack globale (stack-dev), mais si chaque projet a besoin de son propre cache isolé,
+  # on peut garder un redis par projet. Sinon, on peut utiliser le redis global.
+  # Pour l'instant, on garde un redis par projet pour éviter les conflits de clés si le préfixe n'est pas géré.
   redis:
     container_name: wp-redis-${PROJECT_NAME}
     image: redis:5-alpine
@@ -42,3 +45,4 @@ services:
 networks:
   backend:
     external: true
+    name: backend

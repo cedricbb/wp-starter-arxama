@@ -11,7 +11,8 @@ $ProjectDomain = "$ProjectName.arxama.local"
 
 $DbName = $ProjectName
 $DbUser = $ProjectName
-$DbPassword = [Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
+# Mot de passe simple alphanumérique pour éviter les problèmes d'échappement
+$DbPassword = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 16 | ForEach-Object {[char]$_})
 
 function New-Salt {
     return [Convert]::ToBase64String((1..64 | ForEach-Object { Get-Random -Maximum 256 }))
@@ -19,6 +20,7 @@ function New-Salt {
 
 Write-Host "🔐 Generating secrets for project: $ProjectName"
 
+# .env pour Docker Compose
 @"
 PROJECT_NAME=$ProjectName
 PROJECT_DOMAIN=$ProjectDomain
@@ -26,25 +28,30 @@ PROJECT_DOMAIN=$ProjectDomain
 DB_NAME=$DbName
 DB_USER=$DbUser
 DB_PASSWORD=$DbPassword
+DB_HOST=mariadb
+DB_ROOT_PASSWORD=root
 "@ | Set-Content $EnvDocker -Encoding UTF8
 
+# .env.local pour Bedrock (PHP)
+# Utilisation de simples quotes pour les valeurs PHP
 @"
-DB_NAME="$DbName"
-DB_USER="$DbUser"
-DB_PASSWORD="$DbPassword"
-DB_HOST="mariadb"
+DB_NAME='$DbName'
+DB_USER='$DbUser'
+DB_PASSWORD='$DbPassword'
+DB_HOST='mariadb'
 
-WP_HOME="https://$ProjectDomain"
-WP_SITEURL="https://$ProjectDomain/wp"
+WP_ENV='development'
+WP_HOME='https://$ProjectDomain'
+WP_SITEURL='https://$ProjectDomain/wp'
 
-AUTH_KEY="$(New-Salt)"
-SECURE_AUTH_KEY="$(New-Salt)"
-LOGGED_IN_KEY="$(New-Salt)"
-NONCE_KEY="$(New-Salt)"
-AUTH_SALT="$(New-Salt)"
-SECURE_AUTH_SALT="$(New-Salt)"
-LOGGED_IN_SALT="$(New-Salt)"
-NONCE_SALT="$(New-Salt)"
+AUTH_KEY='$(New-Salt)'
+SECURE_AUTH_KEY='$(New-Salt)'
+LOGGED_IN_KEY='$(New-Salt)'
+NONCE_KEY='$(New-Salt)'
+AUTH_SALT='$(New-Salt)'
+SECURE_AUTH_SALT='$(New-Salt)'
+LOGGED_IN_SALT='$(New-Salt)'
+NONCE_SALT='$(New-Salt)'
 "@ | Set-Content $EnvLocal -Encoding UTF8
 
 Write-Host "✅ .env and .env.local generated"

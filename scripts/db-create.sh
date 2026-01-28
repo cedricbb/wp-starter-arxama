@@ -5,10 +5,9 @@ echo "🗄️  Initialisation de la base de données..."
 
 # Charger les variables d'environnement si .env existe
 if [ -f .env ]; then
-  # Utilisation de 'set -a' pour exporter automatiquement les variables
-  set -a
-  source .env
-  set +a
+  # On utilise grep pour filtrer UID/GID qui sont des variables readonly en bash
+  # et on exporte les autres
+  export $(grep -v '^#' .env | grep -vE '^(UID|GID)=' | xargs)
 fi
 
 # Vérifications

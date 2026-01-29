@@ -14,11 +14,11 @@ fi
 PROJECT_NAME=$(basename "$(pwd)")
 PROJECT_DOMAIN="$PROJECT_NAME.arxama.local"
 
-# Configuration DB
+# Configuration DB - SIMPLIFIÉE POUR LE DÉVELOPPEMENT LOCAL
+# On utilise root/root pour éviter les problèmes de création d'utilisateurs dynamiques
 DB_NAME="$PROJECT_NAME"
-DB_USER="$PROJECT_NAME"
-# Génération d'un mot de passe aléatoire pour la DB
-DB_PASSWORD=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9')
+DB_USER="root"
+DB_PASSWORD="root"
 
 generate_salt () {
   openssl rand -base64 64 | tr -d '\n'
@@ -26,8 +26,7 @@ generate_salt () {
 
 echo "🔐 Generating secrets for project: $PROJECT_NAME"
 
-# 1. .env (pour Docker Compose)
-# On ne met pas de guillemets ici car Docker Compose préfère sans, sauf si nécessaire
+# .env pour Docker Compose
 cat > $ENV_DOCKER <<EOF
 PROJECT_NAME=$PROJECT_NAME
 PROJECT_DOMAIN=$PROJECT_DOMAIN
@@ -39,8 +38,7 @@ DB_HOST=mariadb
 DB_ROOT_PASSWORD=root
 EOF
 
-# 2. .env.local (pour Bedrock / PHP)
-# Ici on met des guillemets pour éviter les problèmes avec les caractères spéciaux dans les mots de passe/salts
+# .env.local pour Bedrock (PHP)
 cat > $ENV_LOCAL <<EOF
 DB_NAME='$DB_NAME'
 DB_USER='$DB_USER'
@@ -61,4 +59,4 @@ LOGGED_IN_SALT='$(generate_salt)'
 NONCE_SALT='$(generate_salt)'
 EOF
 
-echo "✅ .env and .env.local generated"
+echo "✅ .env and .env.local generated (using root/root for local dev)"

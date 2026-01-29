@@ -9,10 +9,10 @@ if ((Test-Path $EnvDocker) -and (Test-Path $EnvLocal)) {
 $ProjectName = Split-Path (Get-Location) -Leaf
 $ProjectDomain = "$ProjectName.arxama.local"
 
+# Configuration DB - SIMPLIFIÉE POUR LE DÉVELOPPEMENT LOCAL
 $DbName = $ProjectName
-$DbUser = $ProjectName
-# Mot de passe simple alphanumérique pour éviter les problèmes d'échappement
-$DbPassword = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 16 | ForEach-Object {[char]$_})
+$DbUser = "root"
+$DbPassword = "root"
 
 function New-Salt {
     return [Convert]::ToBase64String((1..64 | ForEach-Object { Get-Random -Maximum 256 }))
@@ -33,7 +33,6 @@ DB_ROOT_PASSWORD=root
 "@ | Set-Content $EnvDocker -Encoding UTF8
 
 # .env.local pour Bedrock (PHP)
-# Utilisation de simples quotes pour les valeurs PHP
 @"
 DB_NAME='$DbName'
 DB_USER='$DbUser'
@@ -54,4 +53,4 @@ LOGGED_IN_SALT='$(New-Salt)'
 NONCE_SALT='$(New-Salt)'
 "@ | Set-Content $EnvLocal -Encoding UTF8
 
-Write-Host "✅ .env and .env.local generated"
+Write-Host "✅ .env and .env.local generated (using root/root for local dev)"

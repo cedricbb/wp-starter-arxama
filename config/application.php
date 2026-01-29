@@ -82,6 +82,15 @@ Config::define('WP_HOME', $wp_home);
 Config::define('WP_SITEURL', env('WP_SITEURL') ?: $wp_home . '/wp');
 
 /**
+ * Cookie Settings
+ * Ensure cookies are restricted to the specific subdomain to avoid conflicts
+ * between multiple local projects sharing the same root domain.
+ */
+if (isset($_SERVER['HTTP_HOST'])) {
+    Config::define('COOKIE_DOMAIN', $_SERVER['HTTP_HOST']);
+}
+
+/**
  * Custom Content Directory
  */
 Config::define('CONTENT_DIR', '/app');

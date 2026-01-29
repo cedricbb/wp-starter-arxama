@@ -70,8 +70,16 @@ if (!env('WP_ENVIRONMENT_TYPE') && in_array(WP_ENV, ['production', 'staging', 'd
 /**
  * URLs
  */
-Config::define('WP_HOME', env('WP_HOME'));
-Config::define('WP_SITEURL', env('WP_SITEURL'));
+// Fix dynamique pour le multisite/multi-domaine derrière un proxy
+// Si WP_HOME est défini dans l'env, on l'utilise, sinon on tente de le déduire
+$wp_home = env('WP_HOME');
+if (empty($wp_home) && isset($_SERVER['HTTP_HOST'])) {
+    $proto = (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ? 'https' : 'http';
+    $wp_home = $proto . '://' . $_SERVER['HTTP_HOST'];
+}
+
+Config::define('WP_HOME', $wp_home);
+Config::define('WP_SITEURL', env('WP_SITEURL') ?: $wp_home . '/wp');
 
 /**
  * Custom Content Directory

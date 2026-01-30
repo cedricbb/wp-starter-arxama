@@ -11,12 +11,15 @@ services:
         condition: service_started
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${PROJECT_NAME}.rule=Host(`${PROJECT_DOMAIN}`)"
-      - "traefik.http.routers.${PROJECT_NAME}.entrypoints=websecure"
-      - "traefik.http.routers.${PROJECT_NAME}.tls=true"
-      - "traefik.http.services.${PROJECT_NAME}.loadbalancer.server.port=80"
+      - "traefik.http.routers.wp-${PROJECT_NAME}.rule=Host(`${PROJECT_DOMAIN}`)"
+      - "traefik.http.routers.wp-${PROJECT_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.wp-${PROJECT_NAME}.tls=true"
+      - "traefik.http.routers.wp-${PROJECT_NAME}.service=wp-${PROJECT_NAME}"
+      - "traefik.http.services.wp-${PROJECT_NAME}.loadbalancer.server.port=80"
+      - "traefik.docker.network=backend"
     networks:
       - backend
+      - internal
 
   php:
     container_name: wp-php-${PROJECT_NAME}
@@ -28,11 +31,11 @@ services:
     volumes:
       - ./:/var/www/html
     networks:
-      - backend
+      backend:
+      internal:
+        aliases:
+          - php-fpm
 
-  # Redis est déjà présent dans la stack globale (stack-dev), mais si chaque projet a besoin de son propre cache isolé,
-  # on peut garder un redis par projet. Sinon, on peut utiliser le redis global.
-  # Pour l'instant, on garde un redis par projet pour éviter les conflits de clés si le préfixe n'est pas géré.
   redis:
     container_name: wp-redis-${PROJECT_NAME}
     image: redis:5-alpine
@@ -40,9 +43,10 @@ services:
     labels:
       - "traefik.enable=false"
     networks:
-      - backend
+      - internal
 
 networks:
   backend:
     external: true
-    name: backend
+  internal:
+    driver: bridge

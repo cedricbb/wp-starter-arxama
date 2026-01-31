@@ -18,7 +18,13 @@ final class ElementorWidgets
     {
         // add_action('elementor/widgets/register', [self::class, 'includeWidgetFiles']);
         add_action('wp_enqueue_scripts', [self::class, 'enqueueAssets']);
-        // add_action('elementor/widgets/register', [self::class, 'addControlsToWidgets']);
+
+        // Utiliser le hook correct pour ajouter des contrôles aux widgets existants
+        // 'elementor/element/before_section_end' est un hook dynamique, mais pour enregistrer des contrôles globaux ou modifier des widgets,
+        // il vaut mieux s'assurer qu'Elementor est chargé.
+        // Cependant, addControlsToWidgets utilise des hooks dynamiques, donc on peut l'appeler ici ou sur 'elementor/init'
+
+        add_action('elementor/init', [self::class, 'addControlsToWidgets']);
     }
 
     public static function includeWidgetFiles(): void
@@ -39,11 +45,19 @@ final class ElementorWidgets
             return;
         }
 
-        Plugin::instance()->widgets_manager->register(new $registerClass);
+        // Vérifier si Elementor est actif et si le gestionnaire de widgets est disponible
+        if (did_action('elementor/loaded')) {
+             Plugin::instance()->widgets_manager->register(new $registerClass);
+        }
     }
 
     public static function addControlsToWidgets(): void
     {
+        // Vérification de sécurité pour s'assurer qu'Elementor est bien chargé
+        if (!did_action('elementor/loaded')) {
+            return;
+        }
+
         foreach (ElementorWidgetControls::WIDGET_PARAMS as $idWidgetParam => $params) {
             foreach ($params as $param) {
                 self::addControlsToWidget(
@@ -65,9 +79,16 @@ final class ElementorWidgets
         if (empty($widget) || empty($section) || empty($name) || empty($params)) {
             return;
         }
+
+        // Le hook doit être ajouté, mais l'exécution de la closure dépendra de l'instance de Plugin
         add_action(
             'elementor/element/'.$widget.'/'.$section.'/before_section_end',
             function ($element, $args) use ($params, $name, $responsive) {
+                // Double vérification à l'intérieur du hook
+                if (!did_action('elementor/loaded')) {
+                    return;
+                }
+
                 if (empty($params['fields'])) {
                     if (! $responsive) {
                         $element->add_control($name, $params);

@@ -22,18 +22,20 @@ final class Loader
 
     public static function addLoaderStyles(): void
     {
-        ?>
-		<style type="text/css">
-			<?php
-            echo file_get_contents(get_stylesheet_directory().'/Assets/styles/loader/loader.css');
-        ?>
-		</style>
-		<?php
+        $loader_css_path = get_stylesheet_directory() . '/Assets/styles/loader/loader.css';
+        if (file_exists($loader_css_path)) {
+            echo '<style type="text/css">';
+            echo file_get_contents($loader_css_path);
+            echo '</style>';
+        }
     }
 
     public static function addLoaderScript(): void
     {
-        wp_enqueue_script('loader_script', get_stylesheet_directory_uri().'/Assets/scripts/loader/loader.js', ['jquery'], false, true);
+        $loader_js_path = get_stylesheet_directory() . '/Assets/scripts/loader/loader.js';
+        if (file_exists($loader_js_path)) {
+            wp_enqueue_script('loader_script', get_stylesheet_directory_uri() . '/Assets/scripts/loader/loader.js', ['jquery'], false, true);
+        }
     }
 
     /**

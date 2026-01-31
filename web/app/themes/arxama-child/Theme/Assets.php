@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Theme;
 
-use function Env\env;
-
 if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
@@ -20,13 +18,17 @@ final class Assets
     public static function addScripts(): void
     {
         self::addStyles();
-        wp_enqueue_script('nom-du-theme_script', env('THEME_PATH_URI').'/Assets/dist/js/scripts.min.js', ['jquery']);
-        wp_localize_script('nom-du-theme_script', 'directory_uri', ['stylesheet_directory_uri' => env('THEME_PATH_URI')]);
-        wp_localize_script('nom-du-theme_script', 'ajaxurl', [admin_url('admin-ajax.php')]);
+        $theme_uri = get_stylesheet_directory_uri();
+
+        wp_enqueue_script('arxama-child-script', $theme_uri . '/Assets/dist/js/scripts.min.js', ['jquery'], null, true);
+
+        wp_localize_script('arxama-child-script', 'directory_uri', ['stylesheet_directory_uri' => $theme_uri]);
+        wp_localize_script('arxama-child-script', 'ajaxurl', [admin_url('admin-ajax.php')]);
     }
 
     public static function addStyles(): void
     {
-        wp_enqueue_style('nom-du-theme_theme', env('THEME_PATH_URI').'/Assets/dist/css/styles.min.css', [], wp_get_theme()->get('Version'), 'all');
+        $theme_uri = get_stylesheet_directory_uri();
+        wp_enqueue_style('arxama-child-style', $theme_uri . '/Assets/dist/css/styles.min.css', [], wp_get_theme()->get('Version'), 'all');
     }
 }
